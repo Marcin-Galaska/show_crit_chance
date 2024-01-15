@@ -124,34 +124,48 @@ mod:hook_safe("HudElementPlayerWeapon", "update", function(self, dt, t, ui_rende
     mod._current_crit_chance= CriticalStrike.chance(mod._player, mod._weapon_handling_template, mod._is_ranged, mod._is_melee)
     local crit_chance_percent = ""
 
-    -- Convert it to text
-    if mod._crit_chance_indicator_icon then
-        if not mod._show_floating_point then
-            crit_chance_percent = mod._crit_chance_indicator_icon .. tostring(math.round(mod._current_crit_chance * 100.0)) .. "%"
+    local string_crit_chance = tostring(mod._current_crit_chance)
+    local before_dot = tonumber(string.sub(string_crit_chance, 3, 4))
+    local after_dot = string.sub(string_crit_chance, 5, 6)
 
-            if mod._guaranteed_crit then
-                crit_chance_percent = mod._crit_chance_indicator_icon .. "100.%"
-            end
-        else
-            local before_dot = tostring(math.round(mod._current_crit_chance * 100.0))
-            local after_dot = string.sub(tostring(mod._current_crit_chance), 5, 6)
-            while #after_dot < 2 do
-                after_dot = after_dot .. "0"
-            end
-            if after_dot == "99" then
-                after_dot = "00"
-            end
-            crit_chance_percent = mod._crit_chance_indicator_icon .. before_dot .. "." .. after_dot .. "%"
-            if mod._guaranteed_crit then
-                crit_chance_percent = mod._crit_chance_indicator_icon .. "100.00%"
-            end
+    -- Player always has >= 1% of crit chance, 'nil' means "00", meaning 100
+    if before_dot == nil then
+        before_dot = 100
+    end
+
+    -- Compensating for floating point and developer imperfections
+    local after_dot_as_number = tonumber(after_dot)
+    if after_dot_as_number and (after_dot_as_number - 9) % 10 == 0 then
+        after_dot_as_number = after_dot_as_number + 1
+
+        if after_dot_as_number == 100 then
+            before_dot = before_dot + 1
+            after_dot_as_number = 0
         end
+
+        after_dot = tostring(after_dot_as_number)
+    end
+
+    -- Convert it to text
+    if mod._show_floating_point then
+        -- Making sure the fixed precision is 2
+        while string.len(after_dot) < 2 do
+            after_dot = after_dot .. "0"
+        end
+
+        crit_chance_percent = mod._crit_chance_indicator_icon .. tostring(before_dot) .. "." .. after_dot .. "%"
+    else
+        -- Mathematically rounding
+        if after_dot_as_number and after_dot_as_number >= 49 then
+            before_dot = before_dot + 1
+        end
+        crit_chance_percent = mod._crit_chance_indicator_icon .. tostring(before_dot) .. "%"
     end
 
     -- Update widget
 	local crit_chance_widget = self._widgets_by_name.crit_chance_indicator
     if crit_chance_widget then
-        crit_chance_widget.dirty = true                                     -- This keeps the widget updating in real time. Who the hell named it 'dirty' though?
+        crit_chance_widget.dirty = true                                                 -- This keeps the widget updating in real time. Who the hell named it 'dirty' though?
         crit_chance_widget.content.crit_chance_indicator_text = crit_chance_percent
 		crit_chance_widget.style.crit_chance_indicator_text.text_color = mod._crit_chance_indicator_appearance
         crit_chance_widget.style.crit_chance_indicator_text.offset = {
