@@ -1,4 +1,4 @@
--- Show Crit Chance mod by mroużon. Ver. 1.0.2
+-- Show Crit Chance mod by mroużon. Ver. 1.0.4
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("show_crit_chance")
@@ -17,7 +17,6 @@ local WeaponTemplate = require("scripts/utilities/weapon/weapon_template")
 mod._current_crit_chance = 0.0                                              -- Player critical chance with drawn weapon, at given frame
 mod._is_ranged = false                                                      -- Whether player holds a ranged weapon
 mod._is_melee = false                                                       -- Whether player holds a melee weapon
-mod._guaranteed_crit = false                                                -- Whether player has a guaranteed crit on next strike
 mod._weapon_handling_template = {}                                          -- Weapon Extensions's handling template
 mod._player = {}                                                            -- Player actor
 mod._crit_chance_indicator_icon_table = {                                   -- Icons the user can add to the crit chance %
@@ -108,12 +107,6 @@ end)
 mod:hook_safe("PlayerUnitWeaponExtension", "update", function (self, unit, dt, t)
     mod._weapon_handling_template = self:weapon_handling_template() or {}
     mod._player = self._player
-
-    local buff_extension = self._buff_extension
-    mod._guaranteed_crit =
-        buff_extension:has_keyword("guaranteed_critical_strike") or
-        mod._is_ranged and buff_extension:has_keyword("guaranteed_ranged_critical_strike") or
-        mod._is_melee and buff_extension:has_keyword("guaranteed_melee_critical_strike")
 end)
 
 mod:hook_safe("HudElementPlayerWeapon", "update", function(self, dt, t, ui_renderer, render_settings, input_service)
@@ -132,6 +125,11 @@ mod:hook_safe("HudElementPlayerWeapon", "update", function(self, dt, t, ui_rende
     -- "00" converted to nil. Since a player always has >= 1% crit chance, this means 100%.
     if before_dot == nil then
         before_dot = 100
+    end
+
+    -- Possible nil for whole % crit chance
+    if after_dot == nil then
+        after_dot = 0
     end
 
     -- Account for float inaccuracy and developer error
@@ -176,7 +174,7 @@ mod:hook_safe("HudElementPlayerWeapon", "update", function(self, dt, t, ui_rende
     -- Update widget
 	local crit_chance_widget = self._widgets_by_name.crit_chance_indicator
     if crit_chance_widget then
-        crit_chance_widget.dirty = true                                                 -- This keeps the widget updating in real time. Who the hell named it 'dirty' though?
+        crit_chance_widget.dirty = true                                                 -- Update widget each frame. Who the hell named it 'dirty', though?
         crit_chance_widget.content.crit_chance_indicator_text = crit_chance_percent
 		crit_chance_widget.style.crit_chance_indicator_text.text_color = mod._crit_chance_indicator_appearance
         crit_chance_widget.style.crit_chance_indicator_text.offset = {
