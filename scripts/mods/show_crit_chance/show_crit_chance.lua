@@ -1,4 +1,4 @@
--- Show Crit Chance mod by mroużon. Ver. 1.0.0
+-- Show Crit Chance mod by mroużon. Ver. 1.0.2
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("show_crit_chance")
@@ -118,48 +118,59 @@ end)
 
 mod:hook_safe("HudElementPlayerWeapon", "update", function(self, dt, t, ui_renderer, render_settings, input_service)
     -- Sadly, this require needs to be here because of NetworkConstants :(
+    -- Seems like a game code issue
     local CriticalStrike = require("scripts/utilities/attack/critical_strike")
 
-    -- Calculate chance to crit
+    -- Calculate crit chance
     mod._current_crit_chance= CriticalStrike.chance(mod._player, mod._weapon_handling_template, mod._is_ranged, mod._is_melee)
-    local crit_chance_percent = ""
+    local crit_chance_percent = "NaN"
 
     local string_crit_chance = tostring(mod._current_crit_chance)
     local before_dot = tonumber(string.sub(string_crit_chance, 3, 4))
-    local after_dot = string.sub(string_crit_chance, 5, 6)
+    local after_dot = tonumber(string.sub(string_crit_chance, 5, 6))
 
-    -- Player always has >= 1% of crit chance, 'nil' means "00", meaning 100
+    -- "00" converted to nil. Since a player always has >= 1% crit chance, this means 100%.
     if before_dot == nil then
         before_dot = 100
     end
 
-    -- Compensating for floating point and developer imperfections
-    local after_dot_as_number = tonumber(after_dot)
-    if after_dot_as_number and (after_dot_as_number - 9) % 10 == 0 then
-        after_dot_as_number = after_dot_as_number + 1
+    -- Account for float inaccuracy and developer error
+    if after_dot and (after_dot - 9) % 10 == 0 then
+        after_dot = after_dot + 1
 
-        if after_dot_as_number == 100 then
+        if after_dot == 100 then
+            after_dot = 0
             before_dot = before_dot + 1
-            after_dot_as_number = 0
         end
-
-        after_dot = tostring(after_dot_as_number)
     end
 
-    -- Convert it to text
+    local before_dot_string = tostring(before_dot)
+
+    -- Convert to text
     if mod._show_floating_point then
+        local after_dot_string = tostring(after_dot)
+
         -- Making sure the fixed precision is 2
-        while string.len(after_dot) < 2 do
-            after_dot = after_dot .. "0"
+        while #after_dot_string < 2 do
+            after_dot_string = after_dot_string .. "0"
         end
 
-        crit_chance_percent = mod._crit_chance_indicator_icon .. tostring(before_dot) .. "." .. after_dot .. "%"
+        crit_chance_percent = mod._crit_chance_indicator_icon .. before_dot_string .. "." .. after_dot_string .. "%"
     else
-        -- Mathematically rounding
-        if after_dot_as_number and after_dot_as_number >= 49 then
-            before_dot = before_dot + 1
+        -- Mathematically round to whole %
+        if after_dot then
+            local after_dot_tens = after_dot
+            if after_dot_tens > 10 then
+                after_dot_tens = after_dot_tens / 10
+            end
+
+            if after_dot_tens >= 5 then
+                before_dot = before_dot + 1
+                before_dot_string = tostring(before_dot)
+            end
         end
-        crit_chance_percent = mod._crit_chance_indicator_icon .. tostring(before_dot) .. "%"
+
+        crit_chance_percent = mod._crit_chance_indicator_icon .. before_dot_string .. "%"
     end
 
     -- Update widget
