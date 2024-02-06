@@ -1,4 +1,4 @@
--- Show Crit Chance mod by mroużon. Ver. 1.0.4
+-- Show Crit Chance mod by mroużon. Ver. 1.0.5
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("show_crit_chance")
@@ -17,6 +17,7 @@ local WeaponTemplate = require("scripts/utilities/weapon/weapon_template")
 mod._current_crit_chance = 0.0                                              -- Player critical chance with drawn weapon, at given frame
 mod._is_ranged = false                                                      -- Whether player holds a ranged weapon
 mod._is_melee = false                                                       -- Whether player holds a melee weapon
+mod._guaranteed_crit = false                                                -- Whether player has a buff that guarantees them a critical strike
 mod._weapon_handling_template = {}                                          -- Weapon Extensions's handling template
 mod._player = {}                                                            -- Player actor
 mod._crit_chance_indicator_icon_table = {                                   -- Icons the user can add to the crit chance %
@@ -94,28 +95,28 @@ mod.on_all_mods_loaded = function()
 end
 
 -- ##################################################
--- Hooks
+-- Custom functions
 -- ##################################################
 
-mod:hook_safe("Orientation", "look_delta", function(main_dt, input, fov_sensitivity, mouse_scale, look_delta_context)
-    local weapon_action_component = look_delta_context.weapon_action_component
-	local weapon_template = weapon_action_component and WeaponTemplate.current_weapon_template(weapon_action_component)
-	mod._is_ranged = weapon_template and WeaponTemplate.is_ranged(weapon_template)
-	mod._is_melee = weapon_template and WeaponTemplate.is_melee(weapon_template)
-end)
+local _check_for_guaranteed_crit = function(player_unit)
+    local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
+	local buffs = buff_extension:buffs()
+    local wanted_buff_name = "zealot_dash_buff"
 
-mod:hook_safe("PlayerUnitWeaponExtension", "update", function (self, unit, dt, t)
-    mod._weapon_handling_template = self:weapon_handling_template() or {}
-    mod._player = self._player
-end)
+	for i = #buffs, 1, -1 do
+		local buff_template = buffs[i]:template()
 
-mod:hook_safe("HudElementPlayerWeapon", "update", function(self, dt, t, ui_renderer, render_settings, input_service)
-    -- Sadly, this require needs to be here because of NetworkConstants :(
-    -- Seems like a game code issue
-    local CriticalStrike = require("scripts/utilities/attack/critical_strike")
+		if buff_template.name == wanted_buff_name then
+			mod._guaranteed_crit = true
 
-    -- Calculate crit chance
-    mod._current_crit_chance= CriticalStrike.chance(mod._player, mod._weapon_handling_template, mod._is_ranged, mod._is_melee)
+			break
+		end
+
+        mod._guaranteed_crit = false
+	end
+end
+
+local _convert_chance_to_text = function(chance)
     local crit_chance_percent = "NaN"
 
     local string_crit_chance = tostring(mod._current_crit_chance)
@@ -170,6 +171,41 @@ mod:hook_safe("HudElementPlayerWeapon", "update", function(self, dt, t, ui_rende
 
         crit_chance_percent = mod._crit_chance_indicator_icon .. before_dot_string .. "%"
     end
+
+    return crit_chance_percent
+end
+
+-- ##################################################
+-- Hooks
+-- ##################################################
+
+mod:hook_safe("Orientation", "look_delta", function(main_dt, input, fov_sensitivity, mouse_scale, look_delta_context)
+    local weapon_action_component = look_delta_context.weapon_action_component
+	local weapon_template = weapon_action_component and WeaponTemplate.current_weapon_template(weapon_action_component)
+	mod._is_ranged = weapon_template and WeaponTemplate.is_ranged(weapon_template)
+	mod._is_melee = weapon_template and WeaponTemplate.is_melee(weapon_template)
+end)
+
+mod:hook_safe("PlayerUnitWeaponExtension", "update", function (self, unit, dt, t)
+    mod._weapon_handling_template = self:weapon_handling_template() or {}
+    mod._player = self._player
+end)
+
+mod:hook_safe("HudElementPlayerWeapon", "update", function(self, dt, t, ui_renderer, render_settings, input_service)
+    -- Sadly, this require needs to be here because of NetworkConstants :(
+    -- Seems like a game code issue
+    local CriticalStrike = require("scripts/utilities/attack/critical_strike")
+
+    _check_for_guaranteed_crit(mod._player.player_unit)
+
+    -- Calculate crit chance
+    if mod._guaranteed_crit then
+        mod._current_crit_chance = 1.0
+    else
+        mod._current_crit_chance = CriticalStrike.chance(mod._player, mod._weapon_handling_template, mod._is_ranged, mod._is_melee)
+    end
+
+    local crit_chance_percent = _convert_chance_to_text(mod._current_crit_chance)
 
     -- Update widget
 	local crit_chance_widget = self._widgets_by_name.crit_chance_indicator
