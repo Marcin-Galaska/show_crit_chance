@@ -1,4 +1,4 @@
--- Show Crit Chance mod by mroużon. Ver. 1.0.5
+-- Show Crit Chance mod by mroużon. Ver. 1.0.6
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("show_crit_chance")
@@ -19,7 +19,7 @@ mod._is_ranged = false                                                      -- W
 mod._is_melee = false                                                       -- Whether player holds a melee weapon
 mod._guaranteed_crit = false                                                -- Whether player has a buff that guarantees them a critical strike
 mod._weapon_handling_template = {}                                          -- Weapon Extensions's handling template
-mod._player = {}                                                            -- Player actor
+mod._player = {}                                                            -- Player handler
 mod._crit_chance_indicator_icon_table = {                                   -- Icons the user can add to the crit chance %
     [1] = "",
     [2] = " ",
@@ -100,13 +100,17 @@ end
 
 local _check_for_guaranteed_crit = function(player_unit)
     local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
+    if not buff_extension then
+        return
+    end
+
 	local buffs = buff_extension:buffs()
     local wanted_buff_name = "zealot_dash_buff"
 
 	for i = #buffs, 1, -1 do
 		local buff_template = buffs[i]:template()
 
-		if buff_template.name == wanted_buff_name then
+		if buff_template.name == wanted_buff_name and mod._is_melee then
 			mod._guaranteed_crit = true
 
 			break
@@ -179,14 +183,12 @@ end
 -- Hooks
 -- ##################################################
 
-mod:hook_safe("Orientation", "look_delta", function(main_dt, input, fov_sensitivity, mouse_scale, look_delta_context)
-    local weapon_action_component = look_delta_context.weapon_action_component
-	local weapon_template = weapon_action_component and WeaponTemplate.current_weapon_template(weapon_action_component)
+mod:hook_safe("PlayerUnitWeaponExtension", "update", function (self, unit, dt, t)
+    local weapon_action_component = self._weapon_action_component
+    local weapon_template = weapon_action_component and WeaponTemplate.current_weapon_template(weapon_action_component)
 	mod._is_ranged = weapon_template and WeaponTemplate.is_ranged(weapon_template)
 	mod._is_melee = weapon_template and WeaponTemplate.is_melee(weapon_template)
-end)
 
-mod:hook_safe("PlayerUnitWeaponExtension", "update", function (self, unit, dt, t)
     mod._weapon_handling_template = self:weapon_handling_template() or {}
     mod._player = self._player
 end)
