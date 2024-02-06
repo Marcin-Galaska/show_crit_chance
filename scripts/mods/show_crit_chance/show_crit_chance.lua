@@ -120,7 +120,7 @@ local _check_for_guaranteed_crit = function(player_unit)
 	end
 end
 
-local _convert_chance_to_text = function(chance)
+local _convert_chance_to_text = function(chance, show_floating_point, icon)
     local crit_chance_percent = "NaN"
 
     local string_crit_chance = tostring(chance)
@@ -150,7 +150,7 @@ local _convert_chance_to_text = function(chance)
     local before_dot_string = tostring(before_dot)
 
     -- Convert to text
-    if mod._show_floating_point then
+    if show_floating_point then
         local after_dot_string = tostring(after_dot)
 
         -- Making sure the fixed precision is 2
@@ -158,7 +158,7 @@ local _convert_chance_to_text = function(chance)
             after_dot_string = after_dot_string .. "0"
         end
 
-        crit_chance_percent = mod._crit_chance_indicator_icon .. before_dot_string .. "." .. after_dot_string .. "%"
+        crit_chance_percent = icon .. before_dot_string .. "." .. after_dot_string .. "%"
     else
         -- Mathematically round to whole %
         if after_dot then
@@ -173,7 +173,7 @@ local _convert_chance_to_text = function(chance)
             end
         end
 
-        crit_chance_percent = mod._crit_chance_indicator_icon .. before_dot_string .. "%"
+        crit_chance_percent = icon .. before_dot_string .. "%"
     end
 
     return crit_chance_percent
@@ -207,7 +207,7 @@ mod:hook_safe("HudElementPlayerWeapon", "update", function(self, dt, t, ui_rende
         mod._current_crit_chance = CriticalStrike.chance(mod._player, mod._weapon_handling_template, mod._is_ranged, mod._is_melee)
     end
 
-    local crit_chance_percent = _convert_chance_to_text(mod._current_crit_chance)
+    local crit_chance_percent = _convert_chance_to_text(mod._current_crit_chance, mod._show_floating_point, mod._crit_chance_indicator_icon)
 
     -- Update widget
 	local crit_chance_widget = self._widgets_by_name.crit_chance_indicator
