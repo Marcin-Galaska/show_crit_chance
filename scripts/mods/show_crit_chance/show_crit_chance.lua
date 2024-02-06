@@ -123,7 +123,7 @@ end
 local _convert_chance_to_text = function(chance)
     local crit_chance_percent = "NaN"
 
-    local string_crit_chance = tostring(mod._current_crit_chance)
+    local string_crit_chance = tostring(chance)
     local before_dot = tonumber(string.sub(string_crit_chance, 3, 4))
     local after_dot = tonumber(string.sub(string_crit_chance, 5, 6))
 
