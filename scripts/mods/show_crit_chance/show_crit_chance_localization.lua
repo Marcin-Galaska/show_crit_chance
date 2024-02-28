@@ -1,4 +1,4 @@
--- Show Crit Chance mod by mroużon. Ver. 1.0.6a
+-- Show Crit Chance mod by mroużon. Ver. 1.0.7
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 -- Russian translation by xsSplater
@@ -28,6 +28,16 @@ return {
 		en = "Represent critical strike chance as a floating point number, not an integer.",
 		ru = "Представлять вероятность критического удара как число с плавающей запятой, а не целое число.",
 		pl = "Wyświetl szansę na trafienie krytyczne jako liczbę zmiennoprzecinkową, nie całkowitą."
+	},
+	only_in_training_grounds = {
+		en = "Only In Psykhanium",
+		ru = "Только в Псайканиуме",
+		pl = "Tylko W Psikhanium"
+	},
+	only_in_training_grounds_desc = {
+		en = "Whether the indicator should be only visible in the Psykhanium.",
+		ru = "Должен ли индикатор быть виден только в Псайканиуме.",
+		pl = "Czy wskaźnik powinien być widoczny tylko w Psikhanium."
 	},
 	crit_chance_indicator_icon = {
 		en = "Crit Chance Icon",

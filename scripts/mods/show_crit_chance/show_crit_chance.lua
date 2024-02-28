@@ -1,4 +1,4 @@
--- Show Crit Chance mod by mroużon. Ver. 1.0.6a
+-- Show Crit Chance mod by mroużon. Ver. 1.0.7
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("show_crit_chance")
@@ -30,6 +30,7 @@ mod._crit_chance_indicator_icon_table = {                                   -- I
 }
 
 mod._show_floating_point = mod:get("show_floating_point")
+mod._only_in_training_grounds = mod:get("only_in_training_grounds")
 mod._crit_chance_indicator_icon = mod._crit_chance_indicator_icon_table[mod:get("crit_chance_indicator_icon")]
 mod._crit_chance_indicator_horizontal_offset = mod:get("crit_chance_indicator_horizontal_offset")
 mod._crit_chance_indicator_vertical_offset = -1 * mod:get("crit_chance_indicator_vertical_offset")
@@ -53,6 +54,8 @@ end
 mod.on_setting_changed = function(id)
     if id == "show_floating_point" then
         mod._show_floating_point = mod:get(id)
+    elseif id == "only_in_training_grounds" then
+        mod._only_in_training_grounds = mod:get(id)
     elseif id == "crit_chance_indicator_icon" then
         mod._crit_chance_indicator_icon = mod._crit_chance_indicator_icon_table[mod:get(id)]
     elseif id == "crit_chance_indicator_horizontal_offset" then
@@ -212,6 +215,14 @@ mod:hook_safe("HudElementPlayerWeapon", "update", function(self, dt, t, ui_rende
     -- Update widget
 	local crit_chance_widget = self._widgets_by_name.crit_chance_indicator
     if crit_chance_widget then
+        -- Set visibility
+        if mod._only_in_training_grounds then
+            local game_mode_name = Managers.state.game_mode:game_mode_name()
+            crit_chance_widget.style.crit_chance_indicator_text.visible = game_mode_name == "shooting_range"
+        else
+            crit_chance_widget.style.crit_chance_indicator_text.visible = true
+        end
+
         crit_chance_widget.dirty = true                                                 -- Update widget each frame. Who the hell named it 'dirty', though?
         crit_chance_widget.content.crit_chance_indicator_text = crit_chance_percent
 		crit_chance_widget.style.crit_chance_indicator_text.text_color = mod._crit_chance_indicator_appearance

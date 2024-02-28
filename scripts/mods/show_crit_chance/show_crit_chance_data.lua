@@ -1,4 +1,4 @@
--- Show Crit Chance mod by mroużon. Ver. 1.0.6a
+-- Show Crit Chance mod by mroużon. Ver. 1.0.7
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("show_crit_chance")
@@ -18,6 +18,12 @@ return {
 						tooltip = "show_floating_point_desc",
 						type = "checkbox",
 						default_value = true
+					},
+					{
+						setting_id = "only_in_training_grounds",
+						tooltip = "only_in_training_grounds_desc",
+						type = "checkbox",
+						default_value = false
 					},
 					{
 						setting_id = "crit_chance_indicator_icon",
