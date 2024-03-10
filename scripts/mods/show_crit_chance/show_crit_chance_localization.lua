@@ -1,7 +1,8 @@
--- Show Crit Chance mod by mroużon. Ver. 1.0.7
+-- Show Crit Chance mod by mroużon. Ver. 1.0.7a
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 -- Russian translation by xsSplater
+-- Chinese translation by deluxghost
 
 return {
 	mod_name = {
