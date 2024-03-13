@@ -41,6 +41,23 @@ mod._crit_chance_indicator_appearance = {
     mod:get("crit_chance_indicator_B")
 }
 
+-- Table of buffs giving 100% crit chance.
+-- Keys are buff names, values are functions returning buff validity
+local guaranteed_crit_buffs = {
+    ["zealot_dash_buff"] = function(...)
+        if mod._is_melee then
+            return true
+        end
+        return false
+    end,
+    ["psyker_guaranteed_ranged_shot_on_stacked"] = function(buff)
+        if mod._is_ranged and buff:stack_count() and buff:stack_count() == 5 then
+            return true
+        end
+        return false
+    end
+}
+
 -- ##################################################
 -- Initalization
 -- ##################################################
@@ -108,12 +125,11 @@ local _check_for_guaranteed_crit = function(player_unit)
     end
 
 	local buffs = buff_extension:buffs()
-    local wanted_buff_name = "zealot_dash_buff"
 
 	for i = #buffs, 1, -1 do
 		local buff_template = buffs[i]:template()
 
-		if buff_template.name == wanted_buff_name and mod._is_melee then
+		if guaranteed_crit_buffs[buff_template.name] and guaranteed_crit_buffs[buff_template.name](buffs[i]) == true then
 			mod._guaranteed_crit = true
 
 			break
