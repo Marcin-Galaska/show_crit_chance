@@ -1,4 +1,4 @@
--- Show Crit Chance mod by mroużon. Ver. 1.0.7a
+-- Show Crit Chance mod by mroużon. Ver. 1.1
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("show_crit_chance")
@@ -13,6 +13,26 @@ return {
 				setting_id  = "crit_chance_indicator_settings_text",
 				type        = "group",
 				sub_widgets = {
+					{
+						setting_id = "font_type",
+						tooltip = "font_type_desc",
+						type = "dropdown",
+						default_value = "proxima_nova_bold",
+						options = {
+							{text = "font_machine_medium", value = "machine_medium", show_widgets = {}},
+							{text = "font_proxima_nova_medium", value = "proxima_nova_medium", show_widgets = {}},
+							{text = "font_proxima_nova_bold", value = "proxima_nova_bold", show_widgets = {}},
+							{text = "font_itc_novarese_medium", value = "itc_novarese_medium", show_widgets = {}},
+							{text = "font_itc_novarese_bold", value = "itc_novarese_bold", show_widgets = {}},
+						}
+					},
+					{
+						setting_id = "font_size",
+						tooltip = "font_size_desc",
+						type = "numeric",
+						default_value = 24,
+						range = {10, 90}
+					},
 					{
 						setting_id = "show_floating_point",
 						tooltip = "show_floating_point_desc",
@@ -49,7 +69,7 @@ return {
 						setting_id = "crit_chance_indicator_opacity",
 						tooltip = "crit_chance_indicator_opacity_desc",
 						type = "numeric",
-						default_value = 140,
+						default_value = 200,
 						range = {0, 255}
 					},
 					{

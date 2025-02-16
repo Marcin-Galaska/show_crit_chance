@@ -1,4 +1,4 @@
--- Show Crit Chance mod by mroużon. Ver. 1.0.7a
+-- Show Crit Chance mod by mroużon. Ver. 1.1
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 -- Russian translation by xsSplater
@@ -22,6 +22,60 @@ return {
 		ru = "Текст Индикатора",
 		pl = "Tekst Wskaźnika",
 		["zh-cn"] = "指示器文本",
+	},
+	font_type = {
+		en = "Font",
+		ru = "Шрифт",
+		pl = "Font",
+		["zh-cn"] = "字体",
+	},
+	font_type_desc = {
+		en = "Font of the indicator's text.",
+		ru = "Шрифт текста индикатора.",
+		pl = "Font tekstu wskaźnika.",
+		["zh-cn"] = "指示器文本的字体。",
+	},
+	font_machine_medium = {
+		en = "Machine Medium",
+		ru = "Machine Medium",
+		pl = "Machine Medium",
+		["zh-cn"] = "Machine Medium"
+	},
+	font_proxima_nova_medium = {
+		en = "Proxima Nova Medium",
+		ru = "Proxima Nova Medium",
+		pl = "Proxima Nova Medium",
+		["zh-cn"] = "Proxima Nova Medium",
+	},
+	font_proxima_nova_bold = {
+		en = "Proxima Nova Bold",
+		ru = "Proxima Nova Bold",
+		pl = "Proxima Nova Bold",
+		["zh-cn"] = "Proxima Nova Bold",
+	},
+	font_itc_novarese_medium = {
+		en = "ITC Novarese Medium",
+		ru = "ITC Novarese Medium",
+		pl = "ITC Novarese Medium",
+		["zh-cn"] = "ITC Novarese Medium"
+	},
+	font_itc_novarese_bold = {
+		en = "ITC Novarese Bold",
+		ru = "ITC Novarese Bold",
+		pl = "ITC Novarese Bold",
+		["zh-cn"] = "ITC Novarese Bold"
+	},
+	font_size = {
+		en = "Font Size",
+		ru = "Размер шрифта",
+		pl = "Rozmiar fontu",
+		["zh-cn"] = "字体大小",
+	},
+	font_size_desc = {
+		en = "Size of the indicator's font.",
+		ru = "Размер шрифта индикатора.",
+		pl = "Rozmiar fontu wskaźnika.",
+		["zh-cn"] = "指示器字体的大小。",
 	},
 	show_floating_point = {
 		en = "Show Floating Point",
