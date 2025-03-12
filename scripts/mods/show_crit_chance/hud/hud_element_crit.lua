@@ -1,4 +1,4 @@
--- Show Crit Chance mod by mroużon. Ver. 1.1
+-- Show Crit Chance mod by mroużon. Ver. 1.1.1
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("show_crit_chance")
@@ -26,8 +26,12 @@ local guaranteed_crit_buffs = {
 }
 
 local _check_for_guaranteed_crit = function(player_unit)
+    if player_unit == nil or player_unit == {} then
+        return
+    end
+
     local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
-    if not buff_extension then
+    if buff_extension == nil or buff_extension == {} then
         return
     end
 
@@ -137,7 +141,7 @@ HudElementCrit.update = function(self, dt, t, ui_renderer, render_settings, inpu
 	local crit_chance_widget = self._widgets_by_name.crit_chance_indicator
     if crit_chance_widget then
         -- Prevent profile:profile() from trying to execute if invalid
-        if not mod._player.profile then
+        if mod._player.profile == nil or mod._player.profile == {} then
             crit_chance_widget.content.crit_chance_indicator_text = ""
             return
         end

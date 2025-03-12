@@ -1,4 +1,4 @@
--- Show Crit Chance mod by mroużon. Ver. 1.1
+-- Show Crit Chance mod by mroużon. Ver. 1.1.1
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local hud_element_crit_settings = {
