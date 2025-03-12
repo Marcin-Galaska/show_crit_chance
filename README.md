@@ -2,12 +2,18 @@
  A Warhammer 40K: Darktide mod that adds an indicator showing the current critikal strike chance.
 
 ### Darktide Mod Framework
-This mod utilizes DMF, a monkey patching framework for Darktide's Autodesk Stringray engine, and is structured accordingly - a *.mod* file and 3 *.lua* files:
+This mod utilizes DMF, a monkey patching framework for Darktide's Autodesk Stringray engine, and is structured accordingly - a *.mod* file and 6 *.lua* files:
 - show_crit_chance.lua - main logic of the modification.
 
 - show_crit_chance_data.lua - in-game configurable variables used in the logic.
 
 - show_crit_chance_localization.lua - localization strings used in UI.
+
+- hud_element_crit_settings.lua - HUD constants
+
+- hud_element_crit_definitions.lua - scenegraph and widget definitions
+
+- hud_element_crit.lua - widget functions and tick logic
 
 **Make sure you are familiar with the [DMF mod installation procedure](https://dmf-docs.darkti.de/#/installing-mods) before attempting to install or modify this repository.**
 
@@ -23,7 +29,7 @@ By default, the indicator is located just below your crosshair:
 
 ![combat](https://github.com/Marcin-Galaska/show_crit_chance/assets/106023363/da799744-61a4-408f-bae7-d2b692e83f47)
 
-You can configure the indicator's text, color, opacity and position on the screen to your liking.
+You can configure the indicator's text (along with the font and its size), color, opacity and position on the screen to your liking.
 
 ## Thanks to Zombine, Redbeardt and others for their input into the Darktide modding community. Their work helped me a lot in the process of creating this mod. The Emperor protects.
 
